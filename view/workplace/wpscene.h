@@ -48,6 +48,28 @@ public slots:
     void addMK();
     void setCenter();
 
+    void paintMidArea(){
+        /* create mid areas */
+        for(int c=0; c<stash->vecpoint.size(); ++c){
+            QVector<gline*> lgl;
+
+            for(int l=0; l<stash->vecline.size(); ++l){
+                if(stash->vecline[l]->exist(stash->vecpoint[c])){
+                    lgl.push_back(stash->vecline[l]);
+                }
+            }
+
+            if(lgl.size() > 1){
+                if(!stash->containsMid(stash->vecpoint[c])){
+                    amid *m = new amid(stash->vecpoint[c], lgl);
+                    addItem(m);
+                    factory->addMid(m);
+                }else
+                    factory->getMid(stash->vecpoint[c])->update_mid(lgl);
+            }
+        }
+    }
+
 private slots:
     void splitLine(gline *line);
     void saveMiddlePos();

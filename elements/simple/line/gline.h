@@ -40,11 +40,18 @@ private:
 
     bool tramway = false;//!!!
 
+    QPointF bl;
+    QPointF br;
+
+    QPointF el;
+    QPointF er;
+
 public: signals:
     void updateLine();
     void splitLine(gline *line);
     void removeSelf(gline *line);
     void editSelf(gline *line);
+    void updateMid();
 
 public:
     bool parentline = false;
@@ -61,6 +68,17 @@ public:
     bool exist(gpoint *p);
     gpoint *getE(gpoint *p);
     gpoint *getB(gpoint *p);
+
+    QVector<QPointF> getLRPT(gpoint *pt){
+        qDebug() << id << "=" << pt->id << ":" << b->id << e->id;
+        if(subline.size()>0){
+            if(e == pt)
+                return {bl,br};
+            if(b == pt)
+                return {el,er};
+        }
+        return QVector<QPointF>();
+    }
 
     QJsonObject json();
     void setjson(QJsonObject data);
@@ -89,50 +107,18 @@ private:
 
     QVector<QPointF> getMainLine();
 
-    void paintRoad();
-    void paintSuline();
-    void paintMiddle();
-    void paintBords();
-    void paintPlace();
+    void paintRoad();//f
+    void paintSuline();//line m/u
+    void paintMiddle();//line mid
+    void paintBords();//white bord
+    void paintPlace();//area pls
 
-    void paintTramway();
-    void paintRails();
-    void paintSurfase(){
-        QPainterPath p = QPainterPath();
-        if(in==0 && out == 0){
-            area->setPath(p);
-            return;
-        }
-        QVector<QPointF> mline = getMainLine();
-        int count = in+out;
-        if(count>0){
-            if(in==0 || out==0){
-                if(count&1){
-                    QVector<QPointF> vec = geom::getBezie(geom::getParralelLine(mline,sizeLen/2+sizeMidLen*count/2+sizeLen*count/2,true));
-                    std::reverse(vec.begin(),vec.end());
-                    vec.append(geom::getBezie(geom::getParralelLine(mline,sizeLen/2+sizeMidLen*count/2+sizeLen*count/2,false)));
-                    p.addPath(ptsConv::pts2Path(vec,false));
-                }else{
-                    QVector<QPointF> vec = geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeMidLen*count/2+sizeLen*count/2,true));
-                    std::reverse(vec.begin(),vec.end());
-                    vec.append(geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeMidLen*count/2+sizeLen*count/2,false)));
-                    p.addPath(ptsConv::pts2Path(vec,false));
-                }
-            }else{
-                QVector<QPointF> vec = geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeMidLen*in+sizeLen*in,true));
-                std::reverse(vec.begin(),vec.end());
-                vec.append(geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeMidLen*out+sizeLen*out,false)));
-                p.addPath(ptsConv::pts2Path(vec,false));
-            }
-        }
-        area->setPath(p);
-    }
-    void freshArea(){
-        place->setPath(QPainterPath());
-        middle->setPath(QPainterPath());
-        sulines->setPath(QPainterPath());
-        area->setPath(QPainterPath());
-    }
+    void paintTramway();//f
+    void paintRails();//black rails
+    void paintSurface();//area pls
+
+    void freshArea();//free all space
+    void setArea(QVector<QPointF> l, QVector<QPointF> r);
 
 private slots:
     //from parentline

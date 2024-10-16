@@ -83,6 +83,7 @@ void wpscene::linkWith(gpoint *p){
     if(linkBusy()){
         if(lpts->doneLink(p)){
             gline *l = lpts->getLink();//linkser is done
+            connect(l,&gline::updateMid,this,&wpscene::paintMidArea);
             connect(l,&gline::splitLine,this,&wpscene::splitLine);
             connect(l,&gline::editSelf,factory->vel,&veledit::setIO);
             addItem(l);
@@ -105,6 +106,7 @@ void wpscene::addAllItems(){
     }
     for(int i=0; i<stash->vecline.size(); ++i){
         connect(stash->vecline[i],&gline::splitLine,this,&wpscene::splitLine);
+        connect(stash->vecline[i],&gline::updateMid,this,&wpscene::paintMidArea);
         addItem(stash->vecline[i]);
         //************************************
         addItem(stash->vecline[i]->place);
@@ -125,6 +127,9 @@ void wpscene::addAllItems(){
     for(int i=0; i<stash->vecwalk.size(); ++i){
         addItem(stash->vecwalk[i]);
     }
+
+    //add mid area
+    paintMidArea();//update after add middle
 }
 
 void wpscene::addNode(){

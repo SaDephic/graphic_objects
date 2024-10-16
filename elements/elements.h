@@ -8,6 +8,7 @@
 #include "cam.h"
 #include "mark.h"
 #include "crosswalk.h"
+#include "simple/amid.h"
 
 //supports
 #include "simple/line/linkpts.h"

@@ -40,6 +40,10 @@ void factorydata::addCrosswalk(crosswalk *c){
     stash->vecwalk.push_back(c);
 }
 
+void factorydata::addMid(amid *m){
+    stash->vecmid.push_back(m);
+}
+
 gpoint *factorydata::getPoint(QPointF pos){
     gpoint *p = new gpoint(pos);
     addPoint(p);
@@ -94,9 +98,32 @@ crosswalk *factorydata::getCrossWalk(QPointF pos){
     return c;
 }
 
+amid *factorydata::getMid(gpoint *p){
+    for(int i=0; i<stash->vecmid.size(); ++i){
+        if(stash->vecmid[i]->m == p)
+            return stash->vecmid[i];
+    }
+    return nullptr;
+}
+
 void factorydata::removeLine(gline *l){
     stash->id.igline.remove(l->id);
     stash->vecline.removeOne(l);
+
+    //remove from mid
+    foreach (amid *m, stash->vecmid) {
+        if(m->containsLine(l)){
+            m->sync.removeOne(l);
+            if(m->sync.size()<2){
+                stash->vecmid.removeOne(m);
+                delete m;
+            }else{
+                m->paintCurrentConfig();
+            }
+        }
+    }
+
+    //removed single link-line
     delete l;
 }
 
@@ -104,6 +131,21 @@ void factorydata::removePoint(gpoint *p){
     removeLinkedLines(p);
     stash->id.igpoint.remove(p->id);
     stash->vecpoint.removeOne(p);
+
+    //****************************************
+    //remove single point
+    //****************************************
+    for(int i=0; i<stash->vecmid.size(); ++i){
+        if(stash->vecmid[i]->m == p){
+            delete stash->vecmid.takeAt(i);
+        }
+    }
+    //update VIEW
+    for(int i=0; i<stash->vecmid.size(); ++i){
+        stash->vecmid[i]->paintCurrentConfig();
+    }
+    //****************************************
+
     delete p;
 }
 

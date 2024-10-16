@@ -21,6 +21,7 @@ public:
     void addMark(mark* m);
     void addCam(cam* c);
     void addCrosswalk(crosswalk* c);
+    void addMid(amid *m);
 
     gpoint *getPoint(QPointF pos = QPointF());
     gpoint *getPointById(int id);
@@ -29,6 +30,7 @@ public:
     cam *getCam(QPointF pos = QPointF());
     mark *getMark(QPointF pos = QPointF());
     crosswalk *getCrossWalk(QPointF pos = QPointF());
+    amid* getMid(gpoint *p);
 
 public slots:
     void removeLine(gline *l);

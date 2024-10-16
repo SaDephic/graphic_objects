@@ -413,25 +413,21 @@ void gline::paintPlace(){
 
     QVector<QPointF> mline = getMainLine();
     if(in>0 && out>0){
-        QVector<QPointF> vec = geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeLen*out + 2,false));
-        std::reverse(vec.begin(),vec.end());
-        vec.append(geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeLen*in + 2,true)));
-        p.addPath(ptsConv::pts2Path(vec,false));
+        QVector<QPointF> l = geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeLen*out + 2,false));
+        QVector<QPointF> r = geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeLen*in + 2,true));
+        setArea(l,r);
     }else{
         int count = in+out;
         if(count&1){
-            QVector<QPointF> vec = geom::getBezie(geom::getParralelLine(mline,sizeLen/2 + ((count-1)/2)*sizeLen + 2,true));
-            std::reverse(vec.begin(),vec.end());
-            vec.append(geom::getBezie(geom::getParralelLine(mline,sizeLen/2 + ((count-1)/2)*sizeLen+ 2,false)));
-            p.addPath(ptsConv::pts2Path(vec,false));
+            QVector<QPointF> l = geom::getBezie(geom::getParralelLine(mline,sizeLen/2 + ((count-1)/2)*sizeLen + 2,true));
+            QVector<QPointF> r = geom::getBezie(geom::getParralelLine(mline,sizeLen/2 + ((count-1)/2)*sizeLen+ 2,false));
+            setArea(l,r);
         }else{
-            QVector<QPointF> vec = geom::getBezie(geom::getParralelLine(mline,sizeLen + ((count-1)/2)*sizeLen + 2,true));
-            std::reverse(vec.begin(),vec.end());
-            vec.append(geom::getBezie(geom::getParralelLine(mline,sizeLen + ((count-1)/2)*sizeLen + 2,false)));
-            p.addPath(ptsConv::pts2Path(vec,false));
+            QVector<QPointF> l = geom::getBezie(geom::getParralelLine(mline,sizeLen + ((count-1)/2)*sizeLen + 2,true));
+            QVector<QPointF> r = geom::getBezie(geom::getParralelLine(mline,sizeLen + ((count-1)/2)*sizeLen + 2,false));
+            setArea(l,r);
         }
     }
-    area->setPath(p);
 }
 
 void gline::paintTramway(){
@@ -443,7 +439,7 @@ void gline::paintTramway(){
     area->setZValue(100);
 
     paintRails();
-    paintSurfase();
+    paintSurface();
 }
 
 void gline::paintRails(){
@@ -504,9 +500,66 @@ void gline::paintRails(){
     sulines->setPath(p);
 }
 
+void gline::paintSurface(){//area pls
+    QPainterPath p = QPainterPath();
+    if(in==0 && out == 0){
+        area->setPath(p);
+        return;
+    }
+    QVector<QPointF> mline = getMainLine();
+    int count = in+out;
+    if(count>0){
+        if(in==0 || out==0){
+            if(count&1){
+                QVector<QPointF> l = geom::getBezie(geom::getParralelLine(mline,sizeLen/2+sizeMidLen*count/2+sizeLen*count/2,true));
+                QVector<QPointF> r = geom::getBezie(geom::getParralelLine(mline,sizeLen/2+sizeMidLen*count/2+sizeLen*count/2,false));
+                setArea(l,r);
+            }else{
+                QVector<QPointF> l = geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeMidLen*count/2+sizeLen*count/2,true));
+                QVector<QPointF> r = geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeMidLen*count/2+sizeLen*count/2,false));
+                setArea(l,r);
+            }
+        }else{
+            QVector<QPointF> l = geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeMidLen*in+sizeLen*in,true));
+            QVector<QPointF> r = geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeMidLen*out+sizeLen*out,false));
+            setArea(l,r);
+        }
+    }
+}
+
+void gline::freshArea(){
+    place->setPath(QPainterPath());
+    middle->setPath(QPainterPath());
+    sulines->setPath(QPainterPath());
+    area->setPath(QPainterPath());
+}
+
+void gline::setArea(QVector<QPointF> l, QVector<QPointF> r){
+    if(l.isEmpty() || r.isEmpty())
+        return;
+
+    QPainterPath p = QPainterPath();
+
+    //take v
+    bl = r.first();
+    br = l.first();
+    el = l.last();
+    er = r.last();
+
+    QVector<QPointF> vec;
+    std::reverse(l.begin(),l.end());
+    //paint
+    vec.append(l);
+    vec.append(r);
+    p.addPath(ptsConv::pts2Path(vec,false));
+
+    area->setPath(p);
+}
+
 void gline::paintAll(){
-    if(!parentline)
+    if(!parentline){
         paintLine();
+    }
     for(int i=0; i<subline.size(); ++i){
         subline[i]->paintLine();
     }
@@ -526,6 +579,9 @@ void gline::paintLine(){
     }else{
         getParentLine()->paintRoad();
     }
+
+    if(parentline)
+    emit getParentLine()->updateMid();//double ask
 }
 
 void gline::hoverEnterEvent(QGraphicsSceneHoverEvent *event){

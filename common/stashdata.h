@@ -19,6 +19,8 @@ public:
     QVector<gpoint*> vecpoint;//100
     QVector<gline*> vecline;//99
 
+    QVector<amid*> vecmid;
+
     QVector<trafficlight*> vectraffic;//110
     QVector<cam*> veccam;//109
     QVector<mark*> vecmark;//108
@@ -32,7 +34,7 @@ public:
     QDomDocument getCW();
 
     void clearData();
-
+    bool containsMid(gpoint *p);
 };
 
 #endif // STASHDATA_H

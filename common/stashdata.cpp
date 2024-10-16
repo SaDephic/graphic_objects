@@ -78,4 +78,17 @@ void stashdata::clearData(){
     while(!vecwalk.isEmpty()){
         emit vecwalk.first()->removeSelf(vecwalk.first());
     }
+    //mid areas
+    while(!vecmid.isEmpty()){
+        delete vecmid.takeFirst();
+    }
+}
+
+bool stashdata::containsMid(gpoint *p){
+    for(int i=0; i<vecmid.size(); ++i){
+        if(vecmid[i]->m == p){
+            return true;
+        }
+    }
+    return false;
 }
