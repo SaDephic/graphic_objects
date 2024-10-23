@@ -30,7 +30,8 @@ public:
     cam *getCam(QPointF pos = QPointF());
     mark *getMark(QPointF pos = QPointF());
     crosswalk *getCrossWalk(QPointF pos = QPointF());
-    amid* getMid(gpoint *p);
+    amid *getMidRes(int idmid);
+    amid *getMid(gpoint *p);
 
 public slots:
     void removeLine(gline *l);

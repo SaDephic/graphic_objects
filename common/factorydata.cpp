@@ -98,6 +98,12 @@ crosswalk *factorydata::getCrossWalk(QPointF pos){
     return c;
 }
 
+amid *factorydata::getMidRes(int idmid){
+    amid *m = new amid(getPointById(idmid));
+    addMid(m);
+    return m;
+}
+
 amid *factorydata::getMid(gpoint *p){
     for(int i=0; i<stash->vecmid.size(); ++i){
         if(stash->vecmid[i]->m == p)

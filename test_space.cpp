@@ -16,6 +16,7 @@ test_space::test_space(){
 
     v = new wpview;
     setCentralWidget(v);
+
     connect(racoss, &rac::currentSelected,this,&test_space::setWindowTitle);
     connect(racoss, &rac::loadDataSelectedCross,this,&test_space::loadCrossData);
     connect(&cd,&crossdata::loadData,this,&test_space::setCurrentCross);

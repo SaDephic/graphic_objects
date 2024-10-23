@@ -127,6 +127,16 @@ void wpscene::addAllItems(){
     for(int i=0; i<stash->vecwalk.size(); ++i){
         addItem(stash->vecwalk[i]);
     }
+    for(int i=0; i<stash->vecmid.size(); ++i){
+        addItem(stash->vecmid[i]);
+        //********************************************
+        addItem(stash->vecmid[i]->bord);
+        addItem(stash->vecmid[i]->varea);
+        addItem(stash->vecmid[i]->vbord);
+        connect(stash->vecmid[i],&amid::addItemToScene,this,&wpscene::addItem);
+        stash->vecmid[i]->paintCurrentConfig();
+        //********************************************
+    }
 
     //add mid area
     paintMidArea();//update after add middle

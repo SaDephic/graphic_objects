@@ -175,6 +175,13 @@ QJsonObject writerdata::getData(){
         }
         data["walk"] = walks;
     }
+    if(!stash->vecmid.isEmpty()){
+        QJsonArray mids;
+        for(int i=0; i<stash->vecmid.size(); ++i){
+            mids.push_back(stash->vecmid[i]->json());
+        }
+        data["mids"] = mids;
+    }
     return data;
 }
 
@@ -209,6 +216,11 @@ void writerdata::setData(QJsonObject data){
     for (int i = 0; i < cws.size(); ++i) {
         QJsonObject o = cws[i].toObject();
         factory->getCrossWalk()->setjson(o);
+    }
+    QJsonArray mds = data["mids"].toArray();
+    for (int i = 0; i < mds.size(); ++i) {
+        QJsonObject o = mds[i].toObject();
+        factory->getMidRes(o["mid"].toInt())->v = o;
     }
 }
 

@@ -63,9 +63,21 @@ public slots:
                 if(!stash->containsMid(stash->vecpoint[c])){
                     amid *m = new amid(stash->vecpoint[c], lgl);
                     addItem(m);
+                    addItem(m->bord);
+                    addItem(m->varea);
+                    addItem(m->vbord);
                     factory->addMid(m);
-                }else
-                    factory->getMid(stash->vecpoint[c])->update_mid(lgl);
+                    connect(m,&amid::addItemToScene,this,&wpscene::addItem);
+                    m->paintCurrentConfig();
+                }else{
+                    amid *m = factory->getMid(stash->vecpoint[c]);
+                    m->update_mid(lgl);
+                    if(!m->v.isEmpty()){
+                        m->setjson(m->v);
+                        m->paintCurrentConfig();
+                        m->v = QJsonObject();
+                    }
+                }
             }
         }
     }

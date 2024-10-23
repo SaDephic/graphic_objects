@@ -29,6 +29,8 @@ gline::~gline(){
 }
 
 void gline::construct(){
+    setOpacity(0.55);
+
     setPen(QPen(Qt::black,2));
     setZValue(150);
     setAcceptHoverEvents(true);
@@ -92,6 +94,45 @@ gpoint *gline::getB(gpoint *p){
     if(e->id == p->id)
         return b;
     return nullptr;
+}
+
+QPointF gline::getSUPT(gpoint *pt){
+    if(subline.size()>0){
+        if(pt == b){
+            return subline.first()->e->scenePos();
+        }
+        if(pt == e){
+            return subline.last()->b->scenePos();
+        }
+    }
+
+    if(pt == b){
+        return e->scenePos();
+    }
+    if(pt == e){
+        return b->scenePos();
+    }
+    return QPointF();
+}
+
+QVector<QPointF> gline::getLRPT(gpoint *pt){
+    if(subline.size()>0){
+        if(e == pt)
+            return {br,bl};
+        if(b == pt)
+            return {er,el};
+    }
+    return QVector<QPointF>();
+}
+
+QVector<QPointF> gline::getBLRPT(gpoint *pt){
+    if(subline.size()>0){
+        if(e == pt)
+            return {abr,abl};
+        if(b == pt)
+            return {aer,ael};
+    }
+    return QVector<QPointF>();
 }
 
 QJsonObject gline::json(){
@@ -180,9 +221,7 @@ void gline::split(QPointF pos){
         pl->subline.push_back(f);
         pl->subline.push_back(s);
     }
-
     setSubOrder();
-
     pl->paintAll();
 }
 
@@ -297,22 +336,18 @@ QJsonArray gline::points(){
 }
 
 QVector<QPointF> gline::getMainLine(){
-    //paint road
     QVector<QPointF> pts;
     if(!subline.isEmpty()){
-        //pts.push_back(subline.first()->e->scenePos());
         for(int i=1; i<subline.size(); ++i){
             pts.push_back(subline[i]->e->scenePos());
         }
-        //pts.push_back(subline.last()->b->scenePos());
-    }/*else{
-            pts.push_back(e->scenePos());
-            pts.push_back(b->scenePos());
-        }*/
+    }
     return pts;
 }
 
 void gline::paintRoad(){
+    setPen(QPen(Qt::black,2));
+
     middle->setPen(QPen(Qt::white,2));
     place->setPen(QPen(Qt::white,2));
     sulines->setPen(QPen(Qt::white,2,Qt::DashLine));
@@ -373,10 +408,9 @@ void gline::paintMiddle(){
         middle->setPath(p);
         return;
     }
-
     QVector<QPointF> mline = getMainLine();
-    p.addPath(ptsConv::pts2Path(geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2,true)),false));//left
-    p.addPath(ptsConv::pts2Path(geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2,false)),false));//right
+    p.addPath(ptsConv::pts2Path(geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2,true)),false));
+    p.addPath(ptsConv::pts2Path(geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2,false)),false));
     middle->setPath(p);
 }
 
@@ -389,19 +423,18 @@ void gline::paintBords(){
 
     QVector<QPointF> mline = getMainLine();
     if(in>0 && out>0){
-        p.addPath(ptsConv::pts2Path(geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeLen*in,true)),false));//left
-        p.addPath(ptsConv::pts2Path(geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeLen*out,false)),false));//right
+        setRoadBArea(geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeLen*in,true)),
+                     geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeLen*out,false)));
     }else{
         int count = in+out;
         if(count&1){
-            p.addPath(ptsConv::pts2Path(geom::getBezie(geom::getParralelLine(mline,sizeLen/2 + ((count-1)/2)*sizeLen,true)),false));
-            p.addPath(ptsConv::pts2Path(geom::getBezie(geom::getParralelLine(mline,sizeLen/2 + ((count-1)/2)*sizeLen,false)),false));
+            setRoadBArea(geom::getBezie(geom::getParralelLine(mline,sizeLen/2 + ((count-1)/2)*sizeLen,true)),
+                         geom::getBezie(geom::getParralelLine(mline,sizeLen/2 + ((count-1)/2)*sizeLen,false)));
         }else{
-            p.addPath(ptsConv::pts2Path(geom::getBezie(geom::getParralelLine(mline,sizeLen + ((count-1)/2)*sizeLen,true)),false));
-            p.addPath(ptsConv::pts2Path(geom::getBezie(geom::getParralelLine(mline,sizeLen + ((count-1)/2)*sizeLen,false)),false));
+            setRoadBArea(geom::getBezie(geom::getParralelLine(mline,sizeLen + ((count-1)/2)*sizeLen,true)),
+                         geom::getBezie(geom::getParralelLine(mline,sizeLen + ((count-1)/2)*sizeLen,false)));
         }
     }
-    place->setPath(p);
 }
 
 void gline::paintPlace(){
@@ -413,25 +446,24 @@ void gline::paintPlace(){
 
     QVector<QPointF> mline = getMainLine();
     if(in>0 && out>0){
-        QVector<QPointF> l = geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeLen*out + 2,false));
-        QVector<QPointF> r = geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeLen*in + 2,true));
-        setArea(l,r);
+        setArea(geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeLen*in+2,true)),
+                geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeLen*out+2,false)));
     }else{
         int count = in+out;
         if(count&1){
-            QVector<QPointF> l = geom::getBezie(geom::getParralelLine(mline,sizeLen/2 + ((count-1)/2)*sizeLen + 2,true));
-            QVector<QPointF> r = geom::getBezie(geom::getParralelLine(mline,sizeLen/2 + ((count-1)/2)*sizeLen+ 2,false));
-            setArea(l,r);
+            setArea(geom::getBezie(geom::getParralelLine(mline,sizeLen/2+((count-1)/2)*sizeLen+2,true)),
+                    geom::getBezie(geom::getParralelLine(mline,sizeLen/2+((count-1)/2)*sizeLen+2,false)));
         }else{
-            QVector<QPointF> l = geom::getBezie(geom::getParralelLine(mline,sizeLen + ((count-1)/2)*sizeLen + 2,true));
-            QVector<QPointF> r = geom::getBezie(geom::getParralelLine(mline,sizeLen + ((count-1)/2)*sizeLen + 2,false));
-            setArea(l,r);
+            setArea(geom::getBezie(geom::getParralelLine(mline,sizeLen+((count-1)/2)*sizeLen+2,true)),
+                    geom::getBezie(geom::getParralelLine(mline,sizeLen+((count-1)/2)*sizeLen+2,false)));
         }
     }
 }
 
 void gline::paintTramway(){
-    sulines->setPen(QPen(Qt::black,2,Qt::DashLine));
+    setPen(QPen(Qt::blue,2));
+
+    sulines->setPen(QPen(Qt::black,2,Qt::SolidLine));
     area->setPen(QPen(Qt::yellow,2));
     area->setBrush(Qt::yellow);
 
@@ -448,7 +480,6 @@ void gline::paintRails(){
         sulines->setPath(p);
         return;
     }
-
     QVector<QPointF> mline = getMainLine();
     int count = in+out;
     if(count>0){
@@ -500,7 +531,7 @@ void gline::paintRails(){
     sulines->setPath(p);
 }
 
-void gline::paintSurface(){//area pls
+void gline::paintSurface(){
     QPainterPath p = QPainterPath();
     if(in==0 && out == 0){
         area->setPath(p);
@@ -511,18 +542,15 @@ void gline::paintSurface(){//area pls
     if(count>0){
         if(in==0 || out==0){
             if(count&1){
-                QVector<QPointF> l = geom::getBezie(geom::getParralelLine(mline,sizeLen/2+sizeMidLen*count/2+sizeLen*count/2,true));
-                QVector<QPointF> r = geom::getBezie(geom::getParralelLine(mline,sizeLen/2+sizeMidLen*count/2+sizeLen*count/2,false));
-                setArea(l,r);
+                setArea(geom::getBezie(geom::getParralelLine(mline,sizeLen/2+sizeMidLen*count/2+sizeLen*count/2,true)),
+                        geom::getBezie(geom::getParralelLine(mline,sizeLen/2+sizeMidLen*count/2+sizeLen*count/2,false)));
             }else{
-                QVector<QPointF> l = geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeMidLen*count/2+sizeLen*count/2,true));
-                QVector<QPointF> r = geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeMidLen*count/2+sizeLen*count/2,false));
-                setArea(l,r);
+                setArea(geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeMidLen*count/2+sizeLen*count/2,true)),
+                        geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeMidLen*count/2+sizeLen*count/2,false)));
             }
         }else{
-            QVector<QPointF> l = geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeMidLen*in+sizeLen*in,true));
-            QVector<QPointF> r = geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeMidLen*out+sizeLen*out,false));
-            setArea(l,r);
+            setArea(geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeMidLen*in+sizeLen*in,true)),
+                    geom::getBezie(geom::getParralelLine(mline,sizeMidLen/2+sizeMidLen*out+sizeLen*out,false)));
         }
     }
 }
@@ -556,6 +584,27 @@ void gline::setArea(QVector<QPointF> l, QVector<QPointF> r){
     area->setPath(p);
 }
 
+void gline::setRoadBArea(QVector<QPointF> l, QVector<QPointF> r){
+    if(l.isEmpty() || r.isEmpty())
+        return;
+
+    QPainterPath p = QPainterPath();
+
+    //take v
+    abl = r.first();
+    abr = l.first();
+    ael = l.last();
+    aer = r.last();
+
+    QVector<QPointF> vec;
+    std::reverse(l.begin(),l.end());
+    //paint
+    p.addPath(ptsConv::pts2Path(l,false));
+    p.addPath(ptsConv::pts2Path(r,false));
+
+    place->setPath(p);
+}
+
 void gline::paintAll(){
     if(!parentline){
         paintLine();
@@ -581,7 +630,7 @@ void gline::paintLine(){
     }
 
     if(parentline)
-    emit getParentLine()->updateMid();//double ask
+        emit getParentLine()->updateMid();//double ask
 }
 
 void gline::hoverEnterEvent(QGraphicsSceneHoverEvent *event){

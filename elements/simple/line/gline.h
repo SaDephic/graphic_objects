@@ -21,6 +21,8 @@ public:
     QGraphicsPathItem *sulines = nullptr;
     QGraphicsPathItem *area = nullptr;
 
+    bool tramway = false;//!!!
+
 private:
     gin_index idsl;
 
@@ -38,13 +40,17 @@ private:
     bool chin = false;
     bool chout = false;
 
-    bool tramway = false;//!!!
-
-    QPointF bl;
+    //area
+    QPointF bl;//b
     QPointF br;
-
-    QPointF el;
+    QPointF el;//e
     QPointF er;
+
+    //road bords
+    QPointF abl;//b
+    QPointF abr;
+    QPointF ael;//e
+    QPointF aer;
 
 public: signals:
     void updateLine();
@@ -69,16 +75,9 @@ public:
     gpoint *getE(gpoint *p);
     gpoint *getB(gpoint *p);
 
-    QVector<QPointF> getLRPT(gpoint *pt){
-        qDebug() << id << "=" << pt->id << ":" << b->id << e->id;
-        if(subline.size()>0){
-            if(e == pt)
-                return {bl,br};
-            if(b == pt)
-                return {el,er};
-        }
-        return QVector<QPointF>();
-    }
+    QPointF getSUPT(gpoint *pt);
+    QVector<QPointF> getLRPT(gpoint *pt);
+    QVector<QPointF> getBLRPT(gpoint *pt);
 
     QJsonObject json();
     void setjson(QJsonObject data);
@@ -119,6 +118,7 @@ private:
 
     void freshArea();//free all space
     void setArea(QVector<QPointF> l, QVector<QPointF> r);
+    void setRoadBArea(QVector<QPointF> l, QVector<QPointF> r);
 
 private slots:
     //from parentline
