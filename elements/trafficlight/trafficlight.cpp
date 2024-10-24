@@ -73,7 +73,7 @@ trafficlight::trafficlight(int typelight){
     selectView->setPen(QPen(Qt::NoPen));
 
     QPainterPath path;
-    path.addRect(QRectF(-4,-4,8,8));
+    path.addEllipse(QRectF(-3,-3,6,6));
     setPath(path);
 
     for(int i=0; i<16; i++){
@@ -304,6 +304,29 @@ QPainterPath trafficlight::getStock(){
 
 QMap<QString, QPainterPath> trafficlight::getLensesAnimate(){
     return lensesitem;
+}
+
+void trafficlight::setVisiblePot(bool state){
+    if(state){
+        QPainterPath path;
+        path.addEllipse(QRectF(-3,-3,6,6));
+        setPath(path);
+        setLLPosition();
+    }else{
+        setPath(QPainterPath());
+        skelet->setPath(QPainterPath());
+        selectView->setPath(QPainterPath());
+    }
+}
+
+void trafficlight::setVisibleSpot(bool state){
+    if(state){
+        setFlag(QGraphicsItem::ItemIsMovable,true);
+        setAcceptHoverEvents(true);
+    }else{
+        setFlag(QGraphicsItem::ItemIsMovable,false);
+        setAcceptHoverEvents(false);
+    }
 }
 
 void trafficlight::setDefaultPosition(){

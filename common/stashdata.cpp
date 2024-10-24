@@ -3,6 +3,7 @@
 QDomDocument stashdata::getCRTL(){
     QDomDocument doc;
     QDomElement el = doc.createElement("g");
+    el.setAttribute("visibility","visible");
     el.setAttribute("id","RT");
     for(int i=0; i<vectraffic.size(); ++i)
         if(vectraffic[i]->t == 0)
@@ -14,6 +15,7 @@ QDomDocument stashdata::getCRTL(){
 QDomDocument stashdata::getTTL(){
     QDomDocument doc;
     QDomElement el = doc.createElement("g");
+    el.setAttribute("visibility","visible");
     el.setAttribute("id","TT");
     for(int i=0; i<vectraffic.size(); ++i)
         if(vectraffic[i]->t == 1)
@@ -26,6 +28,7 @@ QDomDocument stashdata::getCam(){
     QDomDocument doc;
     QDomElement el = doc.createElement("g");
     el.setAttribute("id","CM");
+    el.setAttribute("visibility","hidden");
     for(int i=0; i<veccam.size(); ++i)
         el.appendChild(veccam[i]->dom);
     doc.appendChild(el);
@@ -50,6 +53,34 @@ QDomDocument stashdata::getCW(){
         el.appendChild(vecwalk[i]->dom);
     doc.appendChild(el);
     return doc;
+}
+
+void stashdata::hideManElements(bool state){
+    for(int i=0; i<vecpoint.size(); ++i){
+        vecpoint[i]->setVisible(state);
+    }
+    for(int i=0; i<vecwalk.size(); ++i){
+        vecwalk[i]->setVisibleGarbs(state);
+    }
+    for(int i=0; i<vecmid.size(); ++i){
+        vecmid[i]->setVisibleBords(state);
+    }
+    for(int i=0; i<vecline.size(); ++i){
+        vecline[i]->setVisivbleSubs(state);
+    }
+    for(int i=0; i<veccam.size(); ++i){
+        veccam[i]->setVisiblePot(state);
+    }
+    for(int i=0; i<vecmark.size(); ++i){
+        vecmark[i]->setVisiblePot(state);
+    }
+    for(int i=0; i<vecwalk.size(); ++i){
+        vecwalk[i]->setVisiblePot(state);
+    }
+    for(int i=0; i<vectraffic.size(); ++i){
+        vectraffic[i]->setVisiblePot(state);
+    }
+    //close all visible elements by editors
 }
 
 void stashdata::clearData(){
@@ -82,6 +113,8 @@ void stashdata::clearData(){
     while(!vecmid.isEmpty()){
         delete vecmid.takeFirst();
     }
+    //clear matrix swap
+    sttable.clear();
 }
 
 bool stashdata::containsMid(gpoint *p){

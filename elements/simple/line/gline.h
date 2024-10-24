@@ -83,6 +83,21 @@ public:
     void setjson(QJsonObject data);
     void setchanges(QJsonObject data);
 
+    void setVisivbleSubs(bool state){
+        if(state){
+            paintAll();
+        }else{
+            setPath(QPainterPath());
+            for(int i=0; i<subline.size(); ++i){
+                subline[i]->setPath(QPainterPath());
+            }
+        }
+        //hide points
+        for(int i=0; i<subpoint.size(); ++i){
+            subpoint[i]->setVisible(state);
+        }
+    }
+
     bool notEmpty();
 
 public:

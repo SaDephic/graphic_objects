@@ -48,6 +48,7 @@ void grabCam::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
 }
 
 cam::cam(){
+    setZValue(108);
     setFlag(QGraphicsItem::ItemIsMovable);
     setAcceptHoverEvents(true);
 
@@ -89,6 +90,16 @@ cam::cam(){
 }
 
 cam::~cam(){}
+
+void cam::setVisiblePot(bool state){
+    if(state){
+        paintView();
+    }else{
+        setPath(QPainterPath());
+        gtext->setPath(QPainterPath());
+        garea->setPath(QPainterPath());
+    }
+}
 
 void cam::setPos(QPointF pos){
     //default pos

@@ -6,11 +6,11 @@ wpscene::wpscene(){
     connect(stash,&stashdata::nullCenter,this,&wpscene::nullCenter);
     addItem(center);
 
-    sow = new QGraphicsPathItem;
+    /*sow = new QGraphicsPathItem;
     sow->setPen(QPen(Qt::red,2));
     sow->setFlag(QGraphicsItem::ItemIsSelectable,false);
     sow->setFlag(QGraphicsItem::ItemIsFocusable,false);
-    addItem(sow);
+    addItem(sow);*/
 
     map = new QGraphicsPixmapItem;
     setMap(wpscene::emptyMap());
@@ -23,14 +23,14 @@ wpscene::wpscene(){
 void wpscene::setMap(QByteArray arr){
     QPixmap pix;
     pix.loadFromData(arr,"PNG");
-    setSceneRect(QRectF(-150,-150,pix.width()+300,pix.height()+300));
+    setSceneRect(QRectF(/*-150,-150,*/0,0,pix.width()/*+300*/,pix.height()/*+300*/));
     map->setOpacity(1);
     map->setPixmap(pix);
 
-    int stp = 50;
-    QFont f = QFont("Times New Roman",14);
+    /*int stp = 50;
+    QFont f = QFont("Times New Roman",14);*/
 
-    QPainterPath so = QPainterPath();
+    /*QPainterPath so = QPainterPath();
     so.addText(QPointF(pix.width()/2,0) + QPointF(0,-stp),f,lsw[0]);//с
     so.addText(QPointF(pix.width(),0) + QPointF(stp,-stp),f,lsw[1]);//св
     so.addText(QPointF(pix.width(),pix.height()/2) + QPointF(stp,0),f,lsw[2]);//в
@@ -39,7 +39,7 @@ void wpscene::setMap(QByteArray arr){
     so.addText(QPointF(0,pix.height()) + QPointF(-stp,stp),f,lsw[5]);//юз
     so.addText(QPointF(0,pix.width()/2) + QPointF(-stp,0),f,lsw[6]);//з
     so.addText(QPointF(0,0) + QPointF(-stp,-stp),f,lsw[7]);//сз
-    sow->setPath(so);
+    sow->setPath(so);*/
 }
 
 QPointF wpscene::centerPos(){

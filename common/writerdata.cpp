@@ -182,6 +182,20 @@ QJsonObject writerdata::getData(){
         }
         data["mids"] = mids;
     }
+
+    // link data
+    if(!stash->sttable.isEmpty()){
+        QJsonArray arr;
+        for(int c=0; c<stash->sttable.size(); ++c){
+            QJsonArray ra;
+            for(int r=0; r<stash->sttable[c].size(); ++r){
+                ra.push_back(stash->sttable[c][r]);
+            }
+            arr.push_back(ra);
+        }
+        data["mtx"] = arr;
+    }
+
     return data;
 }
 
@@ -221,6 +235,15 @@ void writerdata::setData(QJsonObject data){
     for (int i = 0; i < mds.size(); ++i) {
         QJsonObject o = mds[i].toObject();
         factory->getMidRes(o["mid"].toInt())->v = o;
+    }
+
+    //link
+    QJsonArray mtx = data["mtx"].toArray();
+    for(int c=0; c<mtx.size(); ++c){
+        QJsonArray ra = mtx[c].toArray();
+        for(int r=0; r<ra.size(); ++r){
+            stash->sttable[c][r] = ra[r].toInt();
+        }
     }
 }
 

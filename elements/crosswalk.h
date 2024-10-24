@@ -72,12 +72,28 @@ public:
     }
     ~crosswalk(){}
 
+    void setVisiblePot(bool state){
+        if(state){
+            QPainterPath path;
+            path.addRect(QRectF(-3,-3,6,6));
+            setPath(path);
+        }else{
+            setPath(QPainterPath());
+        }
+    }
+
     void setPos(QPointF pos){
         g[0]->setPos(QPointF(-25,-50));
         g[1]->setPos(QPointF(25,-50));
         g[2]->setPos(QPointF(25,50));
         g[3]->setPos(QPointF(-25,50));
         QGraphicsPathItem::setPos(pos);
+    }
+
+    void setVisibleGarbs(bool state){
+        for(int i=0; i<g.size(); ++i){
+            g[i]->setVisible(state);
+        }
     }
 
     QJsonObject json(){

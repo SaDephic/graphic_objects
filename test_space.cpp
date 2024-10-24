@@ -14,8 +14,17 @@ extern dbdcon *envdb;
 test_space::test_space(){
     setWindowTitle("Редактор");
 
+    tab = new QTabWidget;
+    connect(tab,&QTabWidget::tabBarClicked,this,&test_space::changedTab);
+    tab->setTabPosition(QTabWidget::West);
+
     v = new wpview;
-    setCentralWidget(v);
+    l = new manview;
+
+    tab->addTab(v,"Форма");
+    tab->addTab(l,"Привязка");
+
+    setCentralWidget(tab);
 
     connect(racoss, &rac::currentSelected,this,&test_space::setWindowTitle);
     connect(racoss, &rac::loadDataSelectedCross,this,&test_space::loadCrossData);
@@ -27,7 +36,8 @@ test_space::test_space(){
         if(d.exec()){
             writer->loadData(file().tempsys);
             v->s->setMap(writer->readData(file().tempsys + QDir::separator() + file().m));
-            v->s->addAllItems();;
+            v->s->addAllItems();
+            l->direct->loadMatrix();
         }
     }
 
@@ -125,7 +135,7 @@ void test_space::saveCurrentData(){
 
         QByteArray cmap = v->s->getMap();
         QByteArray cext = writer->extend();
-        QByteArray csvg = writer->svg(cmap);
+        QByteArray csvg = writer->svg(v->s->getMapStruct());
         QByteArray cst = QJsonDocument(writer->getData()).toJson();
 
         //save temp cross data
@@ -176,6 +186,7 @@ void test_space::saveHowObject(){
 void test_space::loadCrossData(){
     cd.createNP();
     cd.askCurrentCross(racoss->getCurrentCross());
+    tab->setCurrentIndex(0);
 }
 
 void test_space::setCurrentCross(){
@@ -184,6 +195,7 @@ void test_space::setCurrentCross(){
     writer->setData(QJsonDocument::fromJson(cd.single_rac["state"].value_byte()).object());
     v->fitInView(v->sceneRect(), Qt::KeepAspectRatio);
     v->s->addAllItems();
+    l->direct->loadMatrix();//set current matrix
 }
 
 void test_space::changeCrossBackMap(){
@@ -209,6 +221,8 @@ void test_space::openObject(){
         writer->setData(QJsonDocument::fromJson(writer->readData(catalog + QDir::separator() + file().t)).object());
         v->fitInView(v->sceneRect(), Qt::KeepAspectRatio);
         v->s->addAllItems();
+
+        tab->setCurrentIndex(0);
     }
 }
 

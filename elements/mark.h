@@ -60,6 +60,18 @@ public:
     void setjson(QJsonObject data);
     void setchanges(QJsonObject data);
 
+    void setVisiblePot(bool state){
+        if(state){
+            QPainterPath path;
+            path.addEllipse(QRectF(-4,-4,8,8));
+            setPath(path);
+            paintView();
+        }else{
+            gtext->setPath(QPainterPath());
+            setPath(QPainterPath());
+        }
+    }
+
 private slots:
     void paintView();
     void editItem();

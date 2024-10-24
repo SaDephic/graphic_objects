@@ -93,6 +93,9 @@ public:
     //for animate view
     QPainterPath getStock();
     QMap<QString,QPainterPath> getLensesAnimate();
+    //manage visible for pass
+    void setVisiblePot(bool state);
+    void setVisibleSpot(bool state);
 
 private:
     void setDefaultPosition();//default position

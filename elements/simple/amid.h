@@ -189,6 +189,12 @@ public:
     bool containsLine(gline *l);
     void paintCurrentConfig();
 
+    void setVisibleBords(bool state){
+        for(int i=0; i<blr.size(); ++i){
+            blr[i]->setVisible(state);
+        }
+    }
+
     bool existSumid(gline *l, gline *r);
 
     QJsonObject json(){

@@ -4,6 +4,7 @@
 #include "common/factorydata.h"
 extern factorydata *factory;
 
+#include <QPainter>
 #include <QGraphicsScene>
 #include <QBuffer>
 #include <QGraphicsSceneMouseEvent>
@@ -11,8 +12,8 @@ extern factorydata *factory;
 class wpscene : public QGraphicsScene{
     Q_OBJECT
 
-    QGraphicsPathItem *sow = nullptr;
-    QVector<QString> lsw = {"С","СЗ","З","ЮЗ","Ю","ЮВ","В","СВ"};
+    //QGraphicsPathItem *sow = nullptr;
+    //QVector<QString> lsw = {"С","СЗ","З","ЮЗ","Ю","ЮВ","В","СВ"};
 
     gpoint *center = nullptr;
 
@@ -34,6 +35,25 @@ public:
 
     static QByteArray emptyMap(QSize size = QSize(450,450));
     QByteArray getMap();
+    QByteArray getMapStruct(){
+        stash->hideManElements(false);
+
+        //sow->setVisible(false);
+
+        QImage image(width(), height(), QImage::Format_ARGB32_Premultiplied);
+        QPainter painter(&image);
+        render(&painter);
+
+        QByteArray ba;
+        QBuffer buffer(&ba);
+        buffer.open(QIODevice::WriteOnly);
+        image.save(&buffer, "PNG");
+
+        //sow->setVisible(true);
+
+        stash->hideManElements(true);
+        return ba;
+    }
 
     void createLink(gpoint *p);
     void linkWith(gpoint *p);

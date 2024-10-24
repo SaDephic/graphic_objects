@@ -60,10 +60,14 @@ SOURCES += \
     view/crosssets.cpp \
     view/eledit/iolinesets.cpp \
     view/eledit/vcam.cpp \
+    view/link/direction.cpp \
+    view/link/manview.cpp \
     view/vdbconnection.cpp \
     view/veledit.cpp \
     view/eledit/vmrk.cpp \
     view/eledit/vtl.cpp \
+    view/workplace/passcene.cpp \
+    view/workplace/pasview.cpp \
     view/workplace/wpscene.cpp \
     view/workplace/wpview.cpp \
     main.cpp \
@@ -102,10 +106,14 @@ HEADERS += \
     view/crosssets.h \
     view/eledit/iolinesets.h \
     view/eledit/vcam.h \
+    view/link/direction.h \
+    view/link/manview.h \
     view/vdbconnection.h \
     view/veledit.h \
     view/eledit/vmrk.h \
     view/eledit/vtl.h \
+    view/workplace/passcene.h \
+    view/workplace/pasview.h \
     view/workplace/wpscene.h \
     view/workplace/wpview.h \
     auth/vauth.h

@@ -63,6 +63,8 @@ public:
     cam();
     ~cam();
 
+    void setVisiblePot(bool state);
+
     void setPos(QPointF pos);
     void setVisibleState(bool state);
 

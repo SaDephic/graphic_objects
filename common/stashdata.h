@@ -14,13 +14,16 @@ public:
     stashdata(){}
     ~stashdata(){}
 
+    QMap<int,QMap<int,int>> sttable;
+
     ielements id;
     QPointF mid;
+
     QVector<gpoint*> vecpoint;//100
     QVector<gline*> vecline;//99
-
     QVector<amid*> vecmid;
 
+    //move els
     QVector<trafficlight*> vectraffic;//110
     QVector<cam*> veccam;//109
     QVector<mark*> vecmark;//108
@@ -32,6 +35,8 @@ public:
     QDomDocument getCam();
     QDomDocument getMK();
     QDomDocument getCW();
+
+    void hideManElements(bool state);
 
     void clearData();
     bool containsMid(gpoint *p);
